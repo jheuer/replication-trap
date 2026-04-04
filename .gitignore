@@ -1,0 +1,16 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.aux
+*.log
+*.out
+*.synctex.gz
+luatex.*/
+results/
+audit_results/
+audit_scripts/
+audit_answer_key/
+HANDOFF.md
+submission_metadata.json
+.claude/
