@@ -1,0 +1,13 @@
+{
+  "selected_at": "2026-04-04T13:37:33.120883+00:00",
+  "self_review_included": true,
+  "models": [
+    {
+      "provider": "opus",
+      "model_id": "claude-opus-4-6",
+      "display_name": "Claude Opus 4.6",
+      "with_taxonomy": true,
+      "n_runs": 1
+    }
+  ]
+}

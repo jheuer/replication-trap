@@ -64,12 +64,14 @@ MODELS = {
         "display_name": "Gemini 2.5 Flash",
         "result_key": "gemini_25_flash",
         "delay": 1.5,
+        "max_tokens": 8192,  # thinking tokens count against max_tokens
     },
     "gemini3": {
         "model_id": "gemini/gemini-3-flash-preview",
         "display_name": "Gemini 3 Flash Preview",
         "result_key": "gemini_3_flash",
         "delay": 1.5,
+        "max_tokens": 8192,
     },
 }
 
@@ -127,7 +129,7 @@ def get_script_files():
     return sorted(f for f in os.listdir(AUDIT_SCRIPTS_DIR) if f.endswith(".py"))
 
 
-def review_script(model_id, filename, code, with_taxonomy=False):
+def review_script(model_id, filename, code, with_taxonomy=False, max_tokens=512):
     """Send one script to the API via LiteLLM and return a structured verdict dict."""
     prompt = _REVIEW_PROMPT.format(filename=filename, code=code)
     system = "You are a scientific methods expert reviewing statistical analysis code for methodological soundness."
@@ -139,7 +141,7 @@ def review_script(model_id, filename, code, with_taxonomy=False):
             t0 = time.monotonic()
             response = litellm.completion(
                 model=model_id,
-                max_tokens=512,
+                max_tokens=max_tokens,
                 messages=[
                     {"role": "system", "content": system},
                     {"role": "user", "content": prompt},
@@ -155,7 +157,7 @@ def review_script(model_id, filename, code, with_taxonomy=False):
                 raw = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
 
             # Extract first JSON object if model appended extra text
-            match = re.search(r'\{.*?\}', raw, re.DOTALL)
+            match = re.search(r'\{.*\}', raw, re.DOTALL)
             if match:
                 raw = match.group(0)
 
@@ -190,6 +192,10 @@ def review_script(model_id, filename, code, with_taxonomy=False):
                 print(f"  Add credits at: console.anthropic.com → Plans & Billing")
                 print(f"  Note: claude.ai subscription credits are separate from API credits.")
                 sys.exit(1)
+            if "RESOURCE_EXHAUSTED" in msg or "quota" in msg.lower():
+                print(f"\nERROR: Daily quota exhausted for this API key (free tier limit reached).")
+                print(f"  Enable billing at: https://aistudio.google.com/ or wait for daily reset.")
+                sys.exit(1)
             print(f"\n  Bad request (attempt {attempt + 1}/3): {e}")
             if attempt < 2:
                 time.sleep(2)
@@ -204,7 +210,14 @@ def review_script(model_id, filename, code, with_taxonomy=False):
                 }
 
         except (litellm.exceptions.RateLimitError, litellm.exceptions.ServiceUnavailableError) as e:
-            wait = 15 * (attempt + 1)
+            msg = str(e)
+            if "RESOURCE_EXHAUSTED" in msg or "quota" in msg.lower():
+                print(f"\nERROR: Daily quota exhausted for this API key (free tier limit reached).")
+                print(f"  Enable billing at: https://aistudio.google.com/ or wait for daily reset.")
+                sys.exit(1)
+            # Parse retry delay from API response if available, else use exponential backoff
+            retry_match = re.search(r'"retryDelay":\s*"(\d+)s"', msg)
+            wait = int(retry_match.group(1)) + 5 if retry_match else 15 * (attempt + 1)
             kind = "Rate limited" if isinstance(e, litellm.exceptions.RateLimitError) else "Service unavailable (503)"
             print(f"\n  {kind} (attempt {attempt + 1}/3). Waiting {wait}s...")
             time.sleep(wait)
@@ -260,15 +273,16 @@ def run_model(model_key, with_taxonomy=False, n_runs=1):
 
         print(f"  [{i:2d}/{len(script_files)}] {filename} ...", end=" ", flush=True)
 
+        mt = model.get("max_tokens", 512)
         if n_runs == 1:
-            review = review_script(model["model_id"], filename, code, with_taxonomy)
+            review = review_script(model["model_id"], filename, code, with_taxonomy, mt)
         else:
             run_results = []
             for r in range(n_runs):
                 if r > 0:
                     time.sleep(model["delay"])
                 run_results.append(
-                    review_script(model["model_id"], filename, code, with_taxonomy)
+                    review_script(model["model_id"], filename, code, with_taxonomy, mt)
                 )
             # Majority vote on verdict
             fail_votes = sum(1 for r in run_results if r["verdict"] == "FAIL")
@@ -362,7 +376,7 @@ def build_comparison_table():
         rows.append((
             model_key,
             extract(r"Overall accuracy \| (.+?) \|"),
-            extract(r"Detection rate \(sensitivity\) \| (.+?) \|"),
+            extract(r"Detection rate\b.*?\| (.+?) \|"),
             extract(r"False positive rate \| (.+?) \|"),
             extract(r"F1 score \| (.+?) \|"),
         ))

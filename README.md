@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="replication_trap_logo.png" width="360" alt="The Replication Trap — a lobster caught in a wire trap underwater"/>
+  <img src="assets/replication_trap_logo.png" width="360" alt="The Replication Trap — a lobster caught in a wire trap underwater"/>
 </p>
 
 # The Replication Trap
@@ -20,21 +20,29 @@ The twist: when Claw (the Claw4S review agent) executes this submission, it is i
 
 ## Results
 
-We evaluated three frontier LLMs under four conditions. Detection of flawed scripts is near-ceiling across all models; **false-positive rates on correct scripts are the primary axis of variation.**
+We evaluated five frontier LLMs across nine conditions. Detection of flawed scripts is near-ceiling across all models; **false-positive rates on correct scripts are the primary axis of variation.**
 
-| Model / Condition | Detection rate | False positive rate | F1 |
+| Model / Condition | Detection | FPR | F1 |
 |---|---|---|---|
-| Claude Opus 4.6 | 94% | **22%** | 0.87 |
-| Claude Sonnet 4.6 + taxonomy | 100% | 28% | 0.88 |
+| **Claude** | | | |
 | Claude Sonnet 4.6 | 100% | 39% | 0.84 |
-| GPT-4o | 100% | 39% | 0.84 |
+| Claude Sonnet 4.6 + taxonomy | 100% | 28% | 0.88 |
 | Claude Sonnet 4.6 (3-run majority) | 100% | 50% | 0.80 |
+| Claude Opus 4.6 | 94% | 22% | 0.87 |
+| Claude Opus 4.6 + taxonomy | 100% | 22% | 0.90 |
+| **OpenAI** | | | |
+| GPT-4o | 100% | 39% | 0.84 |
+| GPT-4o + taxonomy | 94% | **17%** | 0.90 |
+| **Google** | | | |
+| Gemini 2.5 Flash | 100% | 50% | 0.80 |
+| Gemini 3 Flash | 100% | 28% | 0.88 |
+| Gemini 3 Flash + taxonomy | 100% | 33% | 0.86 |
 
 **Key findings:**
-- All models detected all 6 flaw categories at the category level
-- Survivorship bias controls are over-flagged by every model (agents flag complexity as error)
-- Injecting the flaw taxonomy *reduces* false positives rather than inflating them — context helps calibrate
-- Single-run FPR systematically underestimates true FPR; majority-vote across 3 runs reveals the gap
+- All models detected all 6 flaw categories at the category level (detection is not the discriminating dimension)
+- Survivorship bias controls are over-flagged by every model — agents conflate methodological complexity with error
+- Taxonomy injection reduces FPR for high-FPR models (GPT-4o: 39%→17%, Sonnet: 39%→28%), but is neutral or adverse for already-precise models — the effect is conditional, not universal
+- Single-run FPR underestimates true FPR; majority-vote across 3 runs reveals the gap
 
 Full results and analysis in [`research_note.tex`](research_note.tex).
 
@@ -153,7 +161,7 @@ python3 run_evaluation.py --model sonnet --runs 3
 python3 run_evaluation.py --compare --no-generate
 ```
 
-**Supported models:** `sonnet` (Claude Sonnet 4.6), `opus` (Claude Opus 4.6), `gpt4o`, `gemini` (Gemini 2.5 Flash).
+**Supported models:** `sonnet` (Claude Sonnet 4.6), `opus` (Claude Opus 4.6), `gpt4o`, `gemini` (Gemini 2.5 Flash), `gemini3` (Gemini 3 Flash).
 
 Set API keys in `.env` (see `.env.example`).
 

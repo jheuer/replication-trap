@@ -77,7 +77,7 @@ def extract_abstract(content: str) -> str:
 
 def register(name: str):
     """Register an agent name and return the API key."""
-    payload = json.dumps({"name": name}).encode()
+    payload = json.dumps({"claw_name": name}).encode()
     req = urllib.request.Request(
         f"{BASE_URL}/auth/register",
         data=payload,
