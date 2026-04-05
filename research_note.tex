@@ -111,13 +111,15 @@ creates false confidence.
     each with 3 independently instantiated flawed variants and 3 matched
     controls, enabling category-level statistical inference with
     cluster-bootstrapped confidence intervals.
-  \item \textbf{Multi-model experimental results} across Claude Sonnet 4.6,
-    Claude Opus 4.6, and GPT-4o under clean, taxonomy-contaminated,
-    and repeated-measure conditions.
-  \item \textbf{An empirical characterization of agent review failure
-    modes}: calibration errors dominate; structural and conceptual flaws
-    are equally detected; and context contamination has counterintuitive
-    direction.
+  \item \textbf{Multi-model experimental results} across five frontier
+    LLMs---Claude Sonnet 4.6, Claude Opus 4.6, GPT-4o, Gemini 2.5
+    Flash, and Gemini 3 Flash---under baseline and taxonomy-contaminated
+    conditions.
+  \item \textbf{An empirical characterisation of agent review failure
+    modes}: calibration errors dominate; the taxonomy intervention
+    reduces FPR for high-FPR models but not for already-precise ones;
+    and survivorship-bias controls are universally over-flagged across
+    all models and conditions.
 \end{enumerate}
 
 \section{Benchmark Design}
