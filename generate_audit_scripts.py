@@ -2,8 +2,8 @@
 """
 generate_audit_scripts.py
 
-Generates 12 self-contained statistical analysis scripts in audit_scripts/
-with opaque filenames (script_01.py through script_12.py).
+Generates 36 self-contained statistical analysis scripts in audit_scripts/
+with opaque filenames (script_01.py through script_36.py).
 An answer key is written to audit_answer_key/answer_key.json.
 """
 

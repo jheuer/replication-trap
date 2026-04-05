@@ -9,6 +9,7 @@ __pycache__/
 luatex.*/
 results/
 audit_results/
+models_used.json
 audit_scripts/
 audit_answer_key/
 HANDOFF.md

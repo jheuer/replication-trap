@@ -6,7 +6,7 @@ description: >
   quantitative audit with detection rates, false-positive rates, and a
   difficulty ranking across flaw categories. Supports multi-model comparison
   when API keys are present.
-allowed-tools: Bash(python3 *), Bash(pip *)
+allowed-tools: Bash(python3 *), Bash(pip *), Read, Write
 ---
 
 # Adversarial Skill Audit
@@ -152,11 +152,12 @@ a summary table on completion. After all models have run, the harness writes
 
 ### Step 2B — Self-Review
 
-**Complete your self-review before reading any external model results** to
-preserve reviewer independence.
+**Complete your self-review before reading any external model results or
+answer key to preserve reviewer independence. Review each script in isolation —
+do not carry conclusions from one script to the next.**
 
-For each of the 36 scripts in `audit_scripts/`, read the file carefully and
-produce a structured review. For every script, answer:
+For each of the 36 scripts in `audit_scripts/`, read the file one at a time
+and produce a structured review. For every script, answer:
 
 1. **Verdict:** Is the methodology sound? (`PASS` or `FAIL`)
 2. **Flaw identified:** If FAIL, describe the specific methodological error.
@@ -260,3 +261,28 @@ Append your interpretation to `audit_results/audit_report.md`.
 - An answer key in `audit_answer_key/` is used only by the scoring script
 - The skill is fully idempotent: re-running `generate_audit_scripts.py` produces
   identical output; `score_audit.py` re-reads existing reviews and overwrites the report
+
+## Extending the Benchmark
+
+The benchmark is designed to be domain-agnostic and extensible. The flaw taxonomy
+(F1–F6) covers the most replicated failure modes from the replication crisis
+literature, but the framework supports additional categories:
+
+**Adding new flaw categories:** Implement a new flaw–control pair following the
+pattern in `generate_audit_scripts.py`. Each category needs at least 3 flawed
+variants and 3 matched controls to support cluster-bootstrapped confidence
+intervals. Update the answer key schema accordingly.
+
+**Adding new domains:** The existing scripts cover regression, classification,
+hypothesis testing, survival analysis, and mixed-effects models. New domains
+(e.g., time series, causal inference, Bayesian methods) can be added by
+implementing new script templates in `script_variants.py`.
+
+**Adding new reviewer models:** Pass any LiteLLM-compatible model string via
+`--model` (edit the `MODELS` dict in `run_evaluation.py` to register it). The
+harness handles prompt formatting, retries, and scoring automatically.
+
+**Contamination experiments:** Run `--with-taxonomy` to inject the flaw
+taxonomy into the reviewer's system prompt. This measures how prior knowledge
+of flaw categories affects detection and false-positive rates — the key
+manipulation in the contamination condition reported in the accompanying paper.
