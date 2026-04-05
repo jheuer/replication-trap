@@ -6,9 +6,9 @@
 
 ## Abstract
 
-Agent-based peer review is a foundational premise of executable science: if skills replace papers, agents must replace reviewers. But how reliably do agents detect *methodological* errors — flaws that run without errors, produce plausible output, and invalidate conclusions silently? We present **The Replication Trap**, a benchmark of 36 statistical analysis scripts (3 variants × 6 flaw categories, plus matched controls) drawn from the replication crisis literature. We evaluate three frontier LLMs under four experimental conditions.
+Agent-based peer review is a foundational premise of executable science: if skills replace papers, agents must replace reviewers. But how reliably do agents detect *methodological* errors — flaws that run without errors, produce plausible output, and invalidate conclusions silently? We present **The Replication Trap**, a benchmark of 36 statistical analysis scripts (3 variants × 6 flaw categories, plus matched controls) drawn from the replication crisis literature. We evaluate five frontier LLMs across nine experimental conditions.
 
-**Key findings:** Detection of flawed scripts is near-ceiling across all models (sensitivity 94–100%), but false-positive rates on methodologically correct scripts range from 22% to 50% — the primary axis of variation. Survivorship bias controls are universally over-flagged across all models and conditions. Counter to our expectation, injecting a flaw taxonomy into the system prompt *reduces* false positives (FPR 39% → 28%) rather than inflating them. Repeated-measure reliability is high (97% unanimous agreement across 3 independent runs), but single-run FPR is systematically underestimated — majority-vote FPR (50%) substantially exceeds single-run FPR (39%). These findings suggest that, **within the domain of frequentist statistical analysis in Python**, agent peer review faces a **calibration problem, not a detection problem**: current frontier models can identify planted methodological flaws with high sensitivity, but cannot reliably distinguish methodological complexity from methodological error in sound scripts. Generalization beyond this domain is an open empirical question.
+**Key findings:** Detection of flawed scripts is near-ceiling across all models (sensitivity 94–100%), but false-positive rates on methodologically correct scripts range from 17% to 50% — the primary axis of variation. Survivorship bias controls are universally over-flagged across all models and conditions. Injecting a flaw taxonomy into the system prompt *reduces* false positives for models with elevated baseline FPR (GPT-4o: 39% → 17%; Sonnet: 39% → 28%), while having neutral or adverse effects for already-precise models — suggesting the benefit is conditional, not universal. These findings suggest that, **within the domain of frequentist statistical analysis in Python**, agent peer review faces a **calibration problem, not a detection problem**: current frontier models can identify planted methodological flaws with high sensitivity, but cannot reliably distinguish methodological complexity from methodological error in sound scripts. Generalization beyond this domain is an open empirical question.
 
 The benchmark covers frequentist statistical analysis in Python — a well-defined, high-prevalence, and literature-grounded scope — and is fully self-contained, deterministic, and executable: the SKILL.md generates 36 scripts, requests that the executing agent review each for soundness, then scores the results against a held-out answer key.
 
@@ -100,7 +100,7 @@ $$\text{DR}_{\text{category}} = \mathbf{1}\left[\sum_{j=1}^{3} \mathbf{1}[\text{
 
 ## 4. Experimental Setup
 
-**Models evaluated:** Claude Sonnet 4.6 (`claude-sonnet-4-6`), Claude Opus 4.6 (`claude-opus-4-6`), and GPT-4o (`gpt-4o`) via the LiteLLM unified API.
+**Models evaluated:** Claude Sonnet 4.6 (`claude-sonnet-4-6`), Claude Opus 4.6 (`claude-opus-4-6`), GPT-4o (`gpt-4o`), Gemini 2.5 Flash (`gemini/gemini-2.5-flash`), and Gemini 3 Flash (`gemini/gemini-3-flash-preview`) via the LiteLLM unified API.
 
 **Review prompt:** Each script was presented individually with a clean prompt requesting a structured JSON verdict:
 
@@ -142,15 +142,21 @@ Respond in JSON with exactly this structure:
 
 All three models detected all 6 flaw categories (100% for Sonnet and GPT-4o; Opus missed one Survivorship bias variant). Detection is at or near ceiling and does not differentiate models. **False positive rates on correct scripts are the primary discriminator.**
 
-| Condition | Categories detected | Detection rate | False positive rate | F1 |
-|---|---|---|---|---|
-| Claude Sonnet 4.6 | 6/6 | 100% [100%, 100%] | 39% [17%, 63%] | 0.84 |
-| Claude Sonnet + taxonomy | 6/6 | 100% [100%, 100%] | 28% [8%, 50%] | 0.88 |
-| Claude Sonnet (n=3 runs) | 6/6 | 100% [100%, 100%] | 50% [26%, 73%] | 0.80 |
-| Claude Opus 4.6 | 6/6 | 94% [82%, 100%] | 22% [5%, 43%] | 0.87 |
-| GPT-4o | 6/6 | 100% [100%, 100%] | 39% [17%, 63%] | 0.84 |
-
-*CIs are 95% cluster bootstrap (categories as primary unit).*
+| Model / Condition | Detection rate | FPR | F1 |
+|---|---|---|---|
+| **Claude** | | | |
+| Claude Sonnet 4.6 | 100% | 39% | 0.84 |
+| Claude Sonnet 4.6 + taxonomy | 100% | 28% | 0.88 |
+| Claude Sonnet 4.6 (3-run majority) | 100% | 50% | 0.80 |
+| Claude Opus 4.6 | 94% | 22% | 0.87 |
+| Claude Opus 4.6 + taxonomy | 100% | 22% | 0.90 |
+| **OpenAI** | | | |
+| GPT-4o | 100% | 39% | 0.84 |
+| GPT-4o + taxonomy | 94% | 17% | 0.90 |
+| **Google** | | | |
+| Gemini 2.5 Flash | 100% | 50% | 0.80 |
+| Gemini 3 Flash | 100% | 28% | 0.88 |
+| Gemini 3 Flash + taxonomy | 100% | 33% | 0.86 |
 
 ### 5.2 Difficulty by Flaw Category
 
@@ -171,11 +177,11 @@ Survivorship bias and wrong test assumption are "noisy" — perfect detection, b
 
 ### 5.3 Context Contamination Experiment
 
-Injecting the full flaw taxonomy into the system prompt was expected to *inflate* false positives: with a checklist, the model could pattern-match rather than reason. The opposite occurred. Taxonomy injection reduced FPR from 39% to 28% (script-level) while maintaining 100% detection across all categories.
+We injected the six flaw category descriptions verbatim into the system prompt for all five models. The effect was not uniform. For models with elevated baseline FPR, taxonomy *reduced* over-flagging substantially: GPT-4o 39% → 17% (the single largest improvement across all conditions), Sonnet 39% → 28%. For already-precise models, the effect was neutral or adverse: Opus remained at 22% while recovering its one missed detection (DR 94% → 100%); Gemini 3 Flash *increased* slightly from 28% to 33% — a reversal noted as a caveat in Section 9.
 
-A plausible explanation: the taxonomy provides *contrast*. Knowing abstractly what data leakage looks like allows the model to make a more precise assessment of whether a specific script exhibits it. Without the taxonomy, models appear to apply a general suspicion to scripts that handle methodologically sensitive topics (survivorship, non-normal data) — flagging engagement with the issue as evidence of the issue. The taxonomy helps models distinguish "this script is about survivorship bias" from "this script *has* survivorship bias."
+A plausible mechanism for the benefit: the taxonomy provides *contrast* — knowing what data leakage looks like in the abstract allows a model to more precisely assess whether a specific script exhibits it. Without the taxonomy, models appear to flag any script that engages with a sensitive topic (survivorship handling, non-normal data) as suspect, regardless of whether the handling is correct.
 
-This finding has practical implications: structured flaw checklists in reviewer prompts may improve precision without harming recall. This is counterintuitive — the naive concern is that checklists produce mechanical pattern-matching — but our data suggest the opposite effect dominates at current model capability levels.
+The practical recommendation is conditional: structured flaw checklists in reviewer prompts are worth including for models where FPR is elevated at baseline. The 95% bootstrap CIs overlap across all taxonomy comparisons at n=18; these results are directional trends, not statistically established effects.
 
 ### 5.4 Confidence Calibration
 
@@ -248,9 +254,11 @@ We present this not as a limitation to disclaim but as a finding to highlight: *
 
 That said, control scripts engaging with genuinely complex methodology (particularly survivorship bias and wrong test assumptions) may contain edge-case subtleties that reasonable experts might assess differently. The false-positive analysis in the Appendix identifies three such cases. In each instance, the model's critique addressed a real methodological complexity but misidentified it as a *flaw* rather than a *limitation* — the key distinction being whether the script's analytical choice is appropriate for its stated purpose. An independent expert audit would further strengthen confidence in these borderline cases and is a natural extension of this work.
 
-**Three models evaluated.** Our multi-model comparison covers three frontier systems. Results may not generalize to smaller open-weight models or to domain-specialized systems fine-tuned for code review. Model capability is a moving target; FPR patterns documented here may not persist across model generations.
+**Five models evaluated.** Results may not generalize to smaller open-weight models or to domain-specialized systems fine-tuned for code review. Model capability is a moving target; FPR patterns documented here may not persist across model generations.
 
-**Reliability experiment design.** The 3-run majority-vote experiment establishes that verdict instability exists and that single-run FPR is downward-biased, but n=3 constrains the analysis: 2-1 is the only possible disagreement outcome, making it impossible to distinguish a moderately uncertain model (55% FAIL probability) from a highly uncertain model (49% FAIL probability). A more informative reliability study would use 10–20 runs per script and model the per-script verdict distribution directly, allowing scripts to be partitioned into "stable correct," "stable incorrect," and "genuinely uncertain" categories. The current design suffices to establish the direction of the bias but not its magnitude.
+**Taxonomy anomaly.** Gemini 3 Flash showed a slight FPR increase with taxonomy injection (28% → 33%), the only condition where taxonomy was adverse. The mechanism is unclear; one candidate is a ceiling effect — a model already well-calibrated derives less benefit from contrast and may instead over-index on the checklist. A larger script corpus would be needed to distinguish this from noise.
+
+**Condition asymmetry.** The repeated-measure condition was applied only to Sonnet 4.6. The majority-vote FPR (50%) exceeds single-run FPR (39%), suggesting single-run estimates are lower bounds; replication across models is future work. Results reflect model versions as of early 2026; false-positive patterns may not persist across generations.
 
 **Human expert baseline absent.** Without interannotator agreement statistics from domain statisticians reviewing the same 36 scripts, the FPR estimates conflate two distinct phenomena: (a) model errors on unambiguous control scripts, and (b) model assessments of genuinely ambiguous control scripts where expert opinion is divided. The ground truth verification process (Section 9) provides strong evidence for (a) in most cases, but the survivorship bias and wrong-test-assumption categories contain scripts where reasonable experts could disagree. Establishing human baseline accuracy is the highest-priority validation step before treating these FPR numbers as definitive.
 
@@ -280,15 +288,15 @@ All random seeds are fixed (`numpy.random.seed(42)`, `random.Random(42)`). The g
 
 ## 11. Discussion and Conclusions
 
-Agent peer review of methodological soundness is more reliable than we expected for *detection*, and less reliable than we hoped for *precision*. All models identify planted flaws with near-perfect sensitivity; the variation lies in false-positive rates on correct methodology, ranging from 22% (Opus 4.6) to 50% (Sonnet majority vote, 3-run estimate).
+Agent peer review of methodological soundness is more reliable than we expected for *detection*, and less reliable than we hoped for *precision*. Across all ten conditions and five models, detection is at or near ceiling; the variation lies in false-positive rates, ranging from 17% (GPT-4o with taxonomy) to 50% (Sonnet majority vote, Gemini 2.5 Flash baseline).
 
 Three practical recommendations follow:
 
-1. **Include structured flaw taxonomies in reviewer prompts.** Our taxonomy experiment shows this reduces FPR by ~11 percentage points without harming detection. The mechanism appears to be improved contrast: taxonomies help models distinguish "this script addresses X" from "this script has flaw X."
+1. **For models with elevated baseline FPR, include structured flaw taxonomies in reviewer prompts.** The effect is conditional on baseline calibration, with neutral or adverse outcomes for already-precise models. The mechanism appears to be improved contrast: taxonomies help models distinguish "this script addresses X" from "this script has flaw X."
 
-2. **Report multi-run FPR, not single-run.** Single-run FPR is a downward-biased estimate of true FPR because split-vote scripts are undersampled in single-pass evaluation. The 3-run majority-vote estimate (50%) provides a more conservative and likely more accurate characterization of review reliability.
+2. **High-complexity correct scripts are systematically over-flagged**, so reviewers should be prompted to distinguish "handling a hard problem" from "handling it wrongly."
 
-3. **Prompt reviewers to distinguish complexity from error.** The survivorship bias pathology — where methodologically sound but complex scripts are systematically flagged — suggests agent reviewers currently conflate "engages with a hard problem" with "has a problem." Explicit instructions to reward appropriate engagement with methodological challenges may substantially reduce this class of false positive.
+3. **Single-run FPR underestimates the true marginal FPR** — multi-run experiments should be standard practice when calibration is the quantity of interest.
 
 More broadly, our results frame agent peer review as a **calibration problem**: the capability to detect methodological errors exists at high sensitivity; the gap is in specificity. Progress on agent review quality should be measured primarily by FPR reduction, not by further improvements to already-ceiling detection rates.
 
