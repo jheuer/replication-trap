@@ -27,7 +27,7 @@
 \usepackage{emoji}
 \bibliographystyle{plainnat}
 
-\setlength{\parskip}{0.25em}
+\setlength{\parskip}{0.15em}
 \setlength{\parindent}{0em}
 
 \title{\textbf{The Replication Trap: Precision Failures in LLM Scrutiny\\of Flawed Statistical Workflows}}
@@ -323,15 +323,12 @@ even when the script handles them correctly or acknowledges the
 limitation.
 
 The persistence is striking: one control script (script\_04.py,
-a fund-performance analysis that explicitly includes closed funds to
-avoid survivorship bias) was flagged as a false positive in every one
-of the five experimental conditions, by all three models. A second
-(script\_08.py, a clinical weight-loss ITT analysis with LOCF
-imputation) was flagged in four of five conditions. These are not
-borderline cases where the ground truth is uncertain---both scripts
-were verified correct by construction---but scripts whose correct
-methodology is superficially similar to a flawed one, making them
-systematically vulnerable to pessimism bias across model families.
+a fund-performance analysis that explicitly includes closed funds)
+was flagged in all ten experimental conditions across all five models;
+a second (script\_08.py, a clinical ITT analysis with LOCF imputation)
+in nine of ten. Both were verified correct by construction, but their
+correct methodology is superficially similar to a flawed one---making
+them systematically vulnerable to pessimism bias across model families.
 
 This is a form of \emph{pessimism bias}---agent reviewers flag
 \emph{methodological complexity} as \emph{methodological error},
