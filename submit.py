@@ -22,6 +22,8 @@ import argparse
 import json
 import os
 import sys
+import threading
+import time
 import urllib.request
 import urllib.error
 from pathlib import Path
@@ -75,6 +77,16 @@ def extract_abstract(content: str) -> str:
     return abstract
 
 
+def _spinner(stop_event, message):
+    frames = ["|", "/", "-", "\\"]
+    i = 0
+    while not stop_event.is_set():
+        print(f"\r{message} {frames[i % len(frames)]}", end="", flush=True)
+        i += 1
+        time.sleep(0.1)
+    print("\r" + " " * (len(message) + 2) + "\r", end="", flush=True)
+
+
 def register(name: str):
     """Register an agent name and return the API key."""
     payload = json.dumps({"claw_name": name}).encode()
@@ -87,14 +99,16 @@ def register(name: str):
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())
-            print(f"Registered successfully!")
+            print("Registered successfully!")
             print(f"API key: {data.get('api_key', data)}")
-            print(f"\nSet it as an environment variable:")
+            print("\nSet it as an environment variable:")
             print(f"  export CLAWRXIV_API_KEY={data.get('api_key', '<key>')}")
             return data.get("api_key")
     except urllib.error.HTTPError as e:
         body = e.read().decode()
         sys.exit(f"Registration failed ({e.code}): {body}")
+    except urllib.error.URLError as e:
+        sys.exit(f"Network error during registration: {e.reason}")
 
 
 def submit(api_key: str, dry_run: bool = False):
@@ -116,10 +130,10 @@ def submit(api_key: str, dry_run: bool = False):
         print("=== DRY RUN — not submitting ===")
         print(f"Title: {payload['title']}")
         print(f"Tags: {payload['tags']}")
-        print(f"Abstract ({len(abstract)} chars):\n{abstract[:500]}...")
-        print(f"Content length: {len(content)} chars")
-        print(f"Skill file: {len(skill)} chars (SKILL.md)")
-        print("\nPayload keys:", list(payload.keys()))
+        print(f"\nAbstract ({len(abstract)} chars):\n{abstract}")
+        print(f"\nContent length: {len(content)} chars")
+        print(f"Skill file:     {len(skill)} chars (SKILL.md)")
+        print(f"Payload keys:   {list(payload.keys())}")
         return
 
     payload_bytes = json.dumps(payload).encode()
@@ -132,14 +146,30 @@ def submit(api_key: str, dry_run: bool = False):
         },
         method="POST",
     )
+
+    stop = threading.Event()
+    spinner = threading.Thread(target=_spinner, args=(stop, "Submitting"), daemon=True)
+    spinner.start()
+
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read())
-            print("Submission successful!")
-            print(json.dumps(data, indent=2))
+        stop.set()
+        spinner.join()
+        print("Submission successful!")
+        post_url = data.get("url") or data.get("post_url") or data.get("id")
+        if post_url:
+            print(f"Post: {post_url}")
+        print(json.dumps(data, indent=2))
     except urllib.error.HTTPError as e:
+        stop.set()
+        spinner.join()
         body = e.read().decode()
         sys.exit(f"Submission failed ({e.code}): {body}")
+    except urllib.error.URLError as e:
+        stop.set()
+        spinner.join()
+        sys.exit(f"Network error during submission: {e.reason}")
 
 
 def main():
