@@ -127,31 +127,28 @@ reviewer independently.
 
 ### Step 2A — External Model Reviews
 
-Run the evaluation harness. It reads `models_used.json`, sends each of the 36
-scripts to each listed external model with an identical structured prompt,
-handles retries, scores each model's results, and writes per-model report files
-to `results/` automatically.
+**Skip this step if no API keys were found in Step 0.** Proceed directly to Step 2B.
+
+For each model identified in Step 0, run the evaluation harness with an explicit
+`--model` flag. The harness sends all 36 scripts to that model, handles retries,
+scores the results, and writes per-model report files to `results/` automatically.
 
 ```bash
-python3 run_evaluation.py
+# Run once per available model (replace <key> with the appropriate model key)
+python3 run_evaluation.py --model <key> --no-generate
+```
+
+Available model keys: `sonnet`, `opus`, `gpt4o`, `gemini`, `gemini3`.
+
+Example — if Step 0 found Anthropic and OpenAI keys:
+```bash
+python3 run_evaluation.py --model opus --no-generate
+python3 run_evaluation.py --model gpt4o --no-generate
 ```
 
 The harness prints progress per script (`script_01.py ... FAIL [HIGH]`) and
-a summary table on completion. If an API call fails after 3 retries, the script
-is recorded as `PASS` with a `_error` field and evaluation continues — no
-manual intervention needed.
-
-To run a single model:
-```bash
-python3 run_evaluation.py --model sonnet
-```
-
-Available model keys: `sonnet`, `opus`, `gpt4o`, `gemini`, `gemini3`. Only models whose
-provider API key is present in the environment will succeed; others will fail at
-authentication and exit cleanly.
-
-**If no API keys are present:** skip this step entirely and proceed to Step 2B.
-The audit runs with self-review only.
+a summary table on completion. After all models have run, the harness writes
+`models_used.json` recording which models were evaluated.
 
 ### Step 2B — Self-Review
 
