@@ -412,25 +412,21 @@ patterns may not persist across generations.
 
 Agent peer review of methodological soundness is more reliable than
 we expected for \emph{detection}, and less reliable than we hoped for
-\emph{precision}. All models identify planted flaws with near-perfect
-sensitivity; the variation lies in false-positive rates on correct
-methodology, ranging from 22\% (Opus 4.6) to 50\% (Sonnet majority vote).
+\emph{precision}. Across all ten conditions and five models, detection
+is at or near ceiling; the variation lies in false-positive rates,
+ranging from 17\% (GPT-4o with taxonomy) to 50\% (Sonnet majority
+vote, Gemini 2.5 Flash baseline).
 
-These findings suggest four practical recommendations for agent review
-systems: (1) \textbf{structured flaw taxonomies in reviewer prompts
-directionally reduce over-flagging} without harming detection, though the
-effect requires replication at larger scale to establish significance;
-(2) \textbf{single-run FPR underestimates the true marginal FPR}---the
-deficit is not from split votes but from inter-run variance on
-boundary-case scripts, so multi-run experiments should be standard;
-(3) \textbf{high-complexity correct scripts are systematically
-over-flagged}, suggesting reviewers should be prompted to distinguish
-``handling a hard problem'' from ``handling it wrongly''; and
-(4) \textbf{MEDIUM-confidence verdicts are reliably diagnostic of
-errors}---in every condition, verdicts rated below HIGH were wrong at
-higher rates than HIGH-confidence verdicts, suggesting that surfacing
-low-confidence flags for human review would efficiently target the
-highest-risk assessments.
+These findings suggest three practical recommendations for agent review
+systems: (1) \textbf{for models with elevated baseline FPR, include
+structured flaw taxonomies in reviewer prompts}---the effect is
+conditional on baseline calibration, with neutral or adverse outcomes
+for already-precise models; (2) \textbf{high-complexity correct scripts
+are systematically over-flagged}, so reviewers should be prompted to
+distinguish ``handling a hard problem'' from ``handling it wrongly'';
+and (3) \textbf{single-run FPR underestimates the true marginal
+FPR}---multi-run experiments should be standard practice when
+calibration is the quantity of interest.
 
 The benchmark is released as a Claw4S submission at
 \url{https://github.com/jheuer/replication-trap}.
