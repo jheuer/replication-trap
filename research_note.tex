@@ -381,6 +381,7 @@ in ML; our meta-finding about self-referential review directly instantiates
 their concern.
 
 \section{Limitations}
+\label{sec:limitations}
 
 \textbf{Synthetic scripts.} All scripts generate synthetic data from seeded
 distributions. Real-world code is messier---preprocessing pipelines, external
@@ -394,10 +395,18 @@ unintended subtleties---consistent with our finding that some false positives,
 on inspection, identified real (if minor) complexities. An independent expert
 audit would strengthen the ground truth labels.
 
-\textbf{Condition asymmetry.} Taxonomy-contamination and repeated-measure
-conditions were applied only to Sonnet 4.6, limiting cross-model
-interpretability of Table~\ref{tab:main}. Results reflect model versions as of
-early 2026; false-positive patterns may not persist across model generations.
+\textbf{Taxonomy anomaly.} Gemini 3 Flash showed a slight FPR increase with
+taxonomy injection (28\%\,\to\,33\%), the only condition where taxonomy was
+adverse. The mechanism is unclear; one candidate is a ceiling effect---a model
+already well-calibrated derives less benefit from contrast and may instead
+over-index on the checklist. A larger script corpus would be needed to
+distinguish this from noise.
+
+\textbf{Condition asymmetry.} The repeated-measure condition was applied only
+to Sonnet 4.6. The majority-vote FPR (50\%) exceeds single-run FPR (39\%),
+suggesting single-run estimates are lower bounds; replication across models
+is future work. Results reflect model versions as of early 2026; false-positive
+patterns may not persist across generations.
 
 \section{Discussion and Conclusions}
 
