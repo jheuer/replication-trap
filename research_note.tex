@@ -51,16 +51,16 @@ conclusions silently?
 We present \textbf{The Replication Trap}, a benchmark of 36 statistical
 analysis scripts (3 variants $\times$ 6 flaw categories, plus matched
 controls) drawn from the replication crisis literature.
-We evaluate three frontier LLMs under three experimental conditions.
+We evaluate five frontier LLMs across nine experimental conditions.
 \textbf{Key finding: detection of flawed scripts is near-ceiling
-across all models (sensitivity 94--100\%), but false-positive rates
-on methodologically correct scripts range from 22\% to 50\%---the
-primary axis of variation.}
+across all models and conditions (sensitivity 94--100\%), but
+false-positive rates on methodologically correct scripts range from
+17\% to 50\%---the primary axis of variation.}
 Survivorship bias controls are universally over-flagged.
-Counter to our expectation, injecting a flaw taxonomy into the
-system prompt \emph{reduces} false positives rather than inflating them.
-Repeated-measure reliability is high (97\% unanimous agreement across
-3 runs), but single-run FPR is systematically underestimated.
+Injecting a flaw taxonomy into the system prompt \emph{reduces} false
+positives for models with elevated baseline FPR (GPT-4o: 39\%\,\to\,17\%;
+Sonnet: 39\%\,\to\,28\%), while having neutral or adverse effects for
+already-precise models---suggesting the benefit is conditional, not universal.
 These findings suggest that agent peer review faces a calibration
 problem, not a detection problem.
 \end{abstract}
