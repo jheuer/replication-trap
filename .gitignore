@@ -14,3 +14,4 @@ audit_answer_key/
 HANDOFF.md
 submission_metadata.json
 .claude/
+.worktrees/
