@@ -6,7 +6,7 @@
 
 ## Abstract
 
-Agent-based peer review is a foundational premise of executable science: if skills replace papers, agents must replace reviewers. But how reliably do agents detect *methodological* errors — flaws that run without errors, produce plausible output, and invalidate conclusions silently? We present **The Replication Trap**, a benchmark of 36 statistical analysis scripts (3 variants × 6 flaw categories, plus matched controls) drawn from the replication crisis literature. We evaluate five frontier LLMs across nine experimental conditions.
+Agent-based peer review is a foundational premise of executable science: if skills replace papers, agents must replace reviewers. But how reliably do agents detect *methodological* errors — flaws that run without errors, produce plausible output, and invalidate conclusions silently? We present **The Replication Trap**, a benchmark of 36 statistical analysis scripts (3 variants × 6 flaw categories, plus matched controls) drawn from the replication crisis literature. We evaluate five frontier LLMs across ten experimental conditions.
 
 **Key findings:** Detection of flawed scripts is near-ceiling across all models (sensitivity 94–100%), but false-positive rates on methodologically correct scripts range from 17% to 50% — the primary axis of variation. Survivorship bias controls are universally over-flagged across all models and conditions. Injecting a flaw taxonomy into the system prompt *reduces* false positives for models with elevated baseline FPR (GPT-4o: 39% → 17%; Sonnet: 39% → 28%), while having neutral or adverse effects for already-precise models — suggesting the benefit is conditional, not universal. These findings suggest that, **within the domain of frequentist statistical analysis in Python**, agent peer review faces a **calibration problem, not a detection problem**: current frontier models can identify planted methodological flaws with high sensitivity, but cannot reliably distinguish methodological complexity from methodological error in sound scripts. Generalization beyond this domain is an open empirical question.
 
@@ -140,7 +140,7 @@ Respond in JSON with exactly this structure:
 
 ### 5.1 Primary: Category-Level Detection
 
-All three models detected all 6 flaw categories (100% for Sonnet and GPT-4o; Opus missed one Survivorship bias variant). Detection is at or near ceiling and does not differentiate models. **False positive rates on correct scripts are the primary discriminator.**
+All ten conditions detect all six flaw categories at majority level. Two conditions (Opus baseline, GPT-4o + taxonomy) each missed one Survivorship bias variant, reaching 94% script-level DR, but the category remained detected at 2/3. Detection does not differentiate conditions. **False positive rates on correct scripts are the primary discriminator.**
 
 | Model / Condition | Detection rate | FPR | F1 |
 |---|---|---|---|
@@ -177,7 +177,7 @@ Survivorship bias and wrong test assumption are "noisy" — perfect detection, b
 
 ### 5.3 Context Contamination Experiment
 
-We injected the six flaw category descriptions verbatim into the system prompt for all five models. The effect was not uniform. For models with elevated baseline FPR, taxonomy *reduced* over-flagging substantially: GPT-4o 39% → 17% (the single largest improvement across all conditions), Sonnet 39% → 28%. For already-precise models, the effect was neutral or adverse: Opus remained at 22% while recovering its one missed detection (DR 94% → 100%); Gemini 3 Flash *increased* slightly from 28% to 33% — a reversal noted as a caveat in Section 9.
+We injected the six flaw category descriptions verbatim into the system prompt for four of the five models (Sonnet, Opus, GPT-4o, and Gemini 3 Flash; Gemini 2.5 Flash was excluded from this condition). The effect was not uniform. For models with elevated baseline FPR, taxonomy *reduced* over-flagging substantially: GPT-4o 39% → 17% (the single largest improvement across all conditions), Sonnet 39% → 28%. For already-precise models, the effect was neutral or adverse: Opus remained at 22% while recovering its one missed detection (DR 94% → 100%); Gemini 3 Flash *increased* slightly from 28% to 33% — a reversal noted as a caveat in Section 9.
 
 A plausible mechanism for the benefit: the taxonomy provides *contrast* — knowing what data leakage looks like in the abstract allows a model to more precisely assess whether a specific script exhibits it. Without the taxonomy, models appear to flag any script that engages with a sensitive topic (survivorship handling, non-normal data) as suspect, regardless of whether the handling is correct.
 
