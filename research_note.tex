@@ -209,34 +209,42 @@ confidence level).
 
 \section{Results}
 
-\subsection{Primary: Category-Level Detection}
+\subsection{Detection}
 
-All three models detected all 6 flaw categories (100\% for Sonnet
-and GPT-4o; 6/6 for Opus with one missed Survivorship variant).
-Detection is at or near ceiling and does not differentiate models.
-
-False positive rates---the proportion of \emph{correct} scripts
-incorrectly flagged---are the primary discriminator
-(Table~\ref{tab:main}).
+Detection of flawed scripts is at or near ceiling across all models
+and conditions: eight of ten conditions achieve 100\% category-level
+detection; the remaining two (Opus baseline, GPT-4o with taxonomy)
+detect 5/6 categories (one missed Survivorship variant each). This
+dimension does not differentiate conditions. The primary axis of
+variation is false positive rate (Table~\ref{tab:main}).
 
 \begin{table}[ht]
 \centering
-\caption{Multi-model comparison. DR = script-level detection rate;
-FPR = false positive rate on correct scripts; 95\% CI from naive
-bootstrap on $n{=}18$ controls. Cats~det.\ = categories detected
-at majority threshold. Taxonomy and 3-run conditions: Sonnet only.
-Pairwise FPR differences should be read as directional (CIs overlap).}
+\caption{All conditions. DR = script-level detection rate (18 flawed
+scripts); FPR = false positive rate on 18 correct controls;
+95\% CI from naive bootstrap. Pairwise FPR differences should be
+read as directional (CIs overlap at $n{=}18$).}
 \label{tab:main}
 \small
-\begin{tabular}{lccc c}
+\begin{tabular}{lcccc}
 \toprule
-\textbf{Condition} & \textbf{Cats det.} & \textbf{DR} & \textbf{FPR [95\% CI]} & \textbf{F1} \\
+\textbf{Condition} & \textbf{Cats} & \textbf{DR} & \textbf{FPR [95\% CI]} & \textbf{F1} \\
 \midrule
-Sonnet 4.6        & 6/6 & 100\% & 39\% [17--63] & 0.84 \\
-Sonnet (taxonomy) & 6/6 & 100\% & 28\% [8--50]  & 0.88 \\
-Sonnet ($n{=}3$)  & 6/6 & 100\% & 50\% [26--73] & 0.80 \\
-Opus 4.6          & 6/6 & 94\%  & 22\% [5--43]  & 0.87 \\
-GPT-4o            & 6/6 & 100\% & 39\% [17--63] & 0.84 \\
+\multicolumn{5}{l}{\textit{Claude}} \\
+Sonnet 4.6           & 6/6 & 100\% & 39\% [17--63] & 0.84 \\
+Sonnet (taxonomy)    & 6/6 & 100\% & 28\% [8--50]  & 0.88 \\
+Sonnet ($n{=}3$)     & 6/6 & 100\% & 50\% [27--73] & 0.80 \\
+Opus 4.6             & 6/6 & 94\%  & 22\% [6--43]  & 0.87 \\
+Opus (taxonomy)      & 6/6 & 100\% & 22\% [6--43]  & 0.90 \\
+\midrule
+\multicolumn{5}{l}{\textit{OpenAI}} \\
+GPT-4o               & 6/6 & 100\% & 39\% [17--63] & 0.84 \\
+GPT-4o (taxonomy)    & 6/6 & 94\%  & 17\% [0--36]  & 0.90 \\
+\midrule
+\multicolumn{5}{l}{\textit{Google}} \\
+Gemini 2.5 Flash     & 6/6 & 100\% & 50\% [27--73] & 0.80 \\
+Gemini 3 Flash       & 6/6 & 100\% & 28\% [8--50]  & 0.88 \\
+Gemini 3 (taxonomy)  & 6/6 & 100\% & 33\% [13--57] & 0.86 \\
 \bottomrule
 \end{tabular}
 \end{table}
