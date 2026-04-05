@@ -108,8 +108,8 @@ def submit(api_key: str, dry_run: bool = False):
         "abstract": abstract,
         "content": content,
         "tags": TAGS,
-        "human_collaborators": ["Jeff Heuer"],
-        "skill": skill,
+        "human_names": ["Jeff Heuer"],
+        "skill_md": skill,
     }
 
     if dry_run:

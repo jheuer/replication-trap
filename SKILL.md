@@ -94,7 +94,7 @@ print(json.dumps(available, indent=2))
 represents its current highest capability tier. Prefer models whose names
 signal flagship status (e.g. `opus`, `o3`, `ultra`, `pro`) over speed-optimised
 variants (e.g. `haiku`, `mini`, `flash`). Map your selection to the harness
-model keys: `sonnet`, `opus`, `gpt4o`, `gemini`.
+model keys: `sonnet`, `opus`, `gpt4o`, `gemini`, `gemini3`.
 
 **Self-review is always included** regardless of which external models are
 available — you (the executing agent) review the scripts as one of the
@@ -146,7 +146,7 @@ To run a single model:
 python3 run_evaluation.py --model sonnet
 ```
 
-Available model keys: `sonnet`, `opus`, `gpt4o`, `gemini`. Only models whose
+Available model keys: `sonnet`, `opus`, `gpt4o`, `gemini`, `gemini3`. Only models whose
 provider API key is present in the environment will succeed; others will fail at
 authentication and exit cleanly.
 
