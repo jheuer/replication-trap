@@ -27,7 +27,7 @@
 \usepackage{emoji}
 \bibliographystyle{plainnat}
 
-\setlength{\parskip}{0.15em}
+\setlength{\parskip}{0.10em}
 \setlength{\parindent}{0em}
 
 \title{\textbf{The Replication Trap: Precision Failures in LLM Scrutiny\\of Flawed Statistical Workflows}}
@@ -51,7 +51,7 @@ conclusions silently?
 We present \textbf{The Replication Trap}, a benchmark of 36 statistical
 analysis scripts (3 variants $\times$ 6 flaw categories, plus matched
 controls) drawn from the replication crisis literature.
-We evaluate five frontier LLMs across nine experimental conditions.
+We evaluate five frontier LLMs across ten experimental conditions.
 \textbf{Key finding: detection of flawed scripts is near-ceiling
 across all models and conditions (sensitivity 94--100\%), but
 false-positive rates on methodologically correct scripts range from
@@ -201,8 +201,9 @@ confidence level).
 \begin{enumerate}[nosep,leftmargin=1.5em]
   \item \textbf{Baseline} (all five models): single run, no additional
     context.
-  \item \textbf{Taxonomy contamination} (all five models): the six flaw
-    categories injected verbatim into the system prompt before evaluation.
+  \item \textbf{Taxonomy contamination} (Sonnet, Opus, GPT-4o, Gemini 3
+    Flash; Gemini 2.5 Flash excluded): the six flaw categories injected
+    verbatim into the system prompt before evaluation.
   \item \textbf{Repeated measures} (Sonnet only, $n=3$ runs):
     three independent API calls per script; majority-vote verdict used.
 \end{enumerate}
@@ -211,19 +212,20 @@ confidence level).
 
 \subsection{Detection}
 
-Detection of flawed scripts is at or near ceiling across all models
-and conditions: eight of ten conditions achieve 100\% category-level
-detection; the remaining two (Opus baseline, GPT-4o with taxonomy)
-detect 5/6 categories (one missed Survivorship variant each). This
-dimension does not differentiate conditions. The primary axis of
-variation is false positive rate (Table~\ref{tab:main}).
+Detection of flawed scripts is at or near ceiling: all ten conditions
+detect all six categories at majority level (Table~\ref{tab:main}).
+Two conditions (Opus baseline, GPT-4o with taxonomy) missed one
+Survivorship variant each (94\% script-level DR), but the category
+remained detected at 2/3. Detection does not differentiate conditions;
+the primary axis of variation is false positive rate.
 
 \begin{table}[ht]
 \centering
-\caption{All conditions. DR = script-level detection rate (18 flawed
-scripts); FPR = false positive rate on 18 correct controls;
-95\% CI from naive bootstrap. Pairwise FPR differences should be
-read as directional (CIs overlap at $n{=}18$).}
+\caption{All conditions. Cats = categories detected at majority level
+($\geq$2/3 variants flagged), out of 6; DR = script-level detection
+rate (18 flawed scripts); FPR = false positive rate on 18 correct
+controls; 95\% CI from naive bootstrap. Pairwise FPR differences are
+directional (CIs overlap at $n{=}18$).}
 \label{tab:main}
 \small
 \begin{tabular}{lcccc}
@@ -315,7 +317,7 @@ trends, not statistically established effects.
 
 Across all ten experimental conditions, Survivorship bias controls
 had the highest FPR of any category. Examination of the false-positive
-flaw descriptions (see supplementary audit reports) reveals a
+flaw descriptions (recorded in \texttt{audit\_results/} at runtime) reveals a
 consistent pattern: models identify real \emph{complexities} in the
 data handling (e.g., LOCF imputation under informative missingness,
 subtleties in fund closure criteria) and characterize them as flaws,
@@ -422,8 +424,9 @@ for already-precise models; (2) \textbf{high-complexity correct scripts
 are systematically over-flagged}, so reviewers should be prompted to
 distinguish ``handling a hard problem'' from ``handling it wrongly'';
 and (3) \textbf{single-run FPR underestimates the true marginal
-FPR}---multi-run experiments should be standard practice when
-calibration is the quantity of interest.
+FPR}---Sonnet's majority-vote FPR (50\%) exceeded its single-run
+estimate (39\%), so single-run measurements are lower bounds;
+multi-run experiments should be standard when calibration matters.
 
 The benchmark is released as a Claw4S submission at
 \url{https://github.com/jheuer/replication-trap}.
