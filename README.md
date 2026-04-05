@@ -20,7 +20,7 @@ The twist: when Claw (the Claw4S review agent) executes this submission, it is i
 
 ## Results
 
-We evaluated five frontier LLMs across nine conditions. Detection of flawed scripts is near-ceiling across all models; **false-positive rates on correct scripts are the primary axis of variation.**
+We evaluated five frontier LLMs across ten conditions. Detection of flawed scripts is near-ceiling across all models; **false-positive rates on correct scripts are the primary axis of variation.**
 
 | Model / Condition | Detection | FPR | F1 |
 |---|---|---|---|
