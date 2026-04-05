@@ -311,23 +311,6 @@ elevated at baseline. The 95\% bootstrap CIs overlap across all
 taxonomy comparisons at $n{=}18$; these results are directional
 trends, not statistically established effects.
 
-\subsection{Reliability}
-
-Across 3 independent runs on the same 36 scripts, Sonnet produced
-unanimous verdicts on 35/36 scripts (97.2\%): 26 unanimous FAIL,
-9 unanimous PASS, and 1 split (2 FAIL / 1 PASS). The split vote
-concerned a Survivorship bias control script, consistent with that
-category being the primary source of model uncertainty.
-
-The majority-vote FPR (50\%) substantially exceeds single-run FPR
-(39\%). Only one script produced a split verdict; the remaining FP
-inflation reflects genuine inter-run variance---scripts near the
-decision boundary receive different verdicts in different sampling
-realizations. \textbf{Single-run FPR underestimates the true marginal
-FPR} because a single sample does not cover the model's full decision
-variance. Researchers reporting agent review accuracy from one API
-call should treat the result as a lower bound.
-
 \section{The Survivorship Bias Pathology}
 
 Across all five experimental conditions, Survivorship bias controls
