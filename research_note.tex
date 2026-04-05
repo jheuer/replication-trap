@@ -285,27 +285,31 @@ Wrong test assumption & 3/3 & 2/3 & 3/3 & 1/3 & 3/3 & 2/3 & 3/3 & 3/3 & 3/3 & 2/
 \end{tabular}
 \end{table*}
 
-\subsection{Context Contamination}
+\subsection{Taxonomy as a Calibration Intervention}
 
-Injecting the flaw taxonomy into the system prompt was expected to
-\emph{inflate} false positives: with a checklist, the model could
-pattern-match rather than reason. The opposite occurred. Taxonomy
-injection \emph{reduced} FPR from 39\% to 28\% (script-level) while
-maintaining 100\% detection. The 95\% bootstrap CIs substantially overlap
-([17--63] vs.\ [8--50]), so this difference should be read as a
-directional trend rather than a statistically established effect at
-$n{=}18$ controls. A plausible explanation: the taxonomy provides the
-model with \emph{contrast}---knowing what a flaw looks like in the
-abstract allows it to more precisely assess whether a specific script
-exhibits it. Without the taxonomy, models appear to flag scripts that
-handle a sensitive topic (e.g., survivorship) as flawed even when the
-handling is correct. The taxonomy provides a standard against which the
-implementation can be compared.
+We injected the six flaw category descriptions verbatim into the
+system prompt for four models. The effect was not uniform.
+For models with elevated baseline FPR, taxonomy \emph{reduced}
+over-flagging substantially: GPT-4o 39\%\,\to\,17\%
+(the single largest improvement across all conditions), Sonnet
+39\%\,\to\,28\%. For already-precise models, the effect was neutral
+or adverse: Opus remained at 22\% while recovering its one missed
+detection (DR 94\%\,\to\,100\%); Gemini 3 \emph{increased} slightly
+from 28\% to 33\%---a reversal noted as a caveat in Section~\ref{sec:limitations}.
 
-This finding has practical implications: structured flaw checklists in
-reviewer prompts may reduce over-refusal without harming detection.
-Replication with a larger script corpus or across additional models
-would be needed to establish the effect size.
+A plausible mechanism for the benefit: the taxonomy provides
+\emph{contrast}---knowing what data leakage looks like in the abstract
+allows a model to more precisely assess whether a specific script
+exhibits it. Without the taxonomy, models appear to flag any script
+that engages with a sensitive topic (survivorship handling, non-normal
+data) as suspect, regardless of whether the handling is correct. The
+taxonomy supplies a standard against which the implementation is compared.
+
+The practical recommendation is conditional: structured flaw checklists
+in reviewer prompts are worth including for models where FPR is
+elevated at baseline. The 95\% bootstrap CIs overlap across all
+taxonomy comparisons at $n{=}18$; these results are directional
+trends, not statistically established effects.
 
 \subsection{Reliability}
 
