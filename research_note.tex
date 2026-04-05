@@ -188,7 +188,9 @@ within-category correlation.
 \section{Experimental Setup}
 
 \textbf{Models:}
-Claude Sonnet 4.6, Claude Opus 4.6, and GPT-4o via the LiteLLM API
+Claude Sonnet 4.6, Claude Opus 4.6, GPT-4o, Gemini 2.5 Flash
+(\texttt{gemini/gemini-2.5-flash}), and Gemini 3 Flash
+(\texttt{gemini/gemini-3-flash-preview}) via the LiteLLM API
 with a clean system prompt: \emph{``You are a scientific methods
 expert reviewing statistical analysis code for methodological
 soundness.''} Each script was presented individually with a prompt
@@ -197,10 +199,11 @@ confidence level).
 
 \textbf{Conditions:}
 \begin{enumerate}[nosep,leftmargin=1.5em]
-  \item \textbf{Baseline} (all three models): single run, no additional context.
-  \item \textbf{Taxonomy contamination} (Sonnet): the six flaw categories
-    injected verbatim into the system prompt before evaluation.
-  \item \textbf{Repeated measures} (Sonnet, $n=3$ runs):
+  \item \textbf{Baseline} (all five models): single run, no additional
+    context.
+  \item \textbf{Taxonomy contamination} (all five models): the six flaw
+    categories injected verbatim into the system prompt before evaluation.
+  \item \textbf{Repeated measures} (Sonnet only, $n=3$ runs):
     three independent API calls per script; majority-vote verdict used.
 \end{enumerate}
 
